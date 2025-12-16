@@ -1,55 +1,60 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!-- SYNC IMPACT REPORT
+Version change: N/A -> 1.0.0
+Added sections: All principles and governance sections
+Removed sections: None
+Templates requiring updates:
+- .specify/templates/plan-template.md ✅ updated
+- .specify/templates/spec-template.md ✅ updated
+- .specify/templates/tasks-template.md ✅ updated
+- .specify/templates/commands/*.md ✅ reviewed
+Follow-up TODOs: None
+-->
+
+# AI-Native Software Development & Physical AI Research Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Research Accuracy & Verification
+All claims must be verified against primary sources with preference given to peer-reviewed research. Technical accuracy in AI, robotics, and simulation is non-negotiable. Any factual assertions must be supported by citations following APA format.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Reproducibility & Transparency
+Every experiment, simulation, and example must be reproducible with clear, detailed instructions. Code examples, setup procedures, and configurations must be documented such that any peer can replicate the results. The RAG chatbot answers must be reproducible by following provided setup scripts.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Academic Rigor & Peer Review
+Content must meet academic standards with preference for peer-reviewed sources (minimum 50% of total sources). Technical implementations must follow established best practices in AI, robotics, and software engineering. All deliverables undergo systematic verification before release.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Modularity & Separation of Concerns
+The system components (research paper, Docusaurus book, RAG chatbot, robotics modules) must be developed with clean interfaces and minimal coupling. Each component should be independently deployable and testable, allowing for parallel development and easier maintenance.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Resource Consciousness & Efficiency
+Development must account for resource limitations including Qdrant Cloud Free Tier constraints, OpenAI API usage, and computational resources for simulations. Optimization and efficiency are required to ensure sustainable operation within free-tier limits.
 
-### [PRINCIPLE_6_NAME]
+### VI. Safety & Ethical AI Practices
+All AI implementations must follow ethical guidelines and safety protocols. Robotics simulations must include appropriate safeguards. The system must not provide information outside its intended scope or violate academic integrity standards.
 
+## Technical Standards
+<!-- Technology stack requirements, compliance standards, deployment policies -->
 
-[PRINCIPLE__DESCRIPTION]
+The project must adhere to the following technical requirements:
+- Research paper in PDF format (5,000–7,000 words) with APA citations
+- Docusaurus-based book deployed on GitHub Pages
+- FastAPI backend with Qdrant vector storage for RAG chatbot
+- ROS 2 middleware for robotics control with Gazebo/Unity simulation
+- NVIDIA Isaac integration for perception and navigation
+- All code must be well-documented with clear setup instructions
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Development Workflow
+<!-- Code review requirements, testing gates, deployment approval process -->
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
-
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
-
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+- Phase-based development with clear milestones and deliverables
+- Regular QA checkpoints to verify accuracy, functionality, and reproducibility
+- Continuous integration with automated testing where applicable
+- Documentation-first approach for all technical components
+- Plagiarism-free content verified through appropriate tools
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+<!-- Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution governs all aspects of the AI-Native Software Development & Physical AI Research project. All contributions must comply with these principles. Amendments to this constitution require explicit documentation of changes, justification for modifications, and approval from project leadership. All team members are responsible for ensuring compliance with these principles during development, testing, and deployment phases.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2025-12-16 | **Last Amended**: 2025-12-16

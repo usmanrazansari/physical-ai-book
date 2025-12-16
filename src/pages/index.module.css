@@ -1,0 +1,308 @@
+/**
+ * CSS module for homepage
+ */
+
+.heroBanner {
+  padding: 6rem 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media screen and (max-width: 996px) {
+  .heroBanner {
+    padding: 4rem 0;
+    min-height: auto;
+  }
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.features {
+  padding: 6rem 0;
+  position: relative;
+}
+
+.features:not(.visible) {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.features.visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.featureCard {
+  margin-bottom: 2rem;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+.featureCard:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.featureCard:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.featureCard:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.featureCardInner {
+  padding: 2rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: var(--ifm-background-surface-color);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  border: 1px solid var(--ifm-color-primary-lightest);
+}
+
+.featureCardInner:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-color: var(--ifm-color-primary-light);
+}
+
+.icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.featureCardInner h3 {
+  color: var(--ifm-color-primary-darker);
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  transition: color 0.3s ease;
+}
+
+[data-theme='dark'] .featureCardInner h3 {
+  color: var(--ifm-color-primary-lighter);
+}
+
+.featureCardInner:hover h3 {
+  color: var(--ifm-color-primary);
+}
+
+.featureCardInner p {
+  color: var(--ifm-color-primary-light);
+  margin-bottom: 0;
+}
+
+[data-theme='dark'] .featureCardInner p {
+  color: var(--ifm-color-primary-lighter);
+}
+
+.featuredBooks {
+  padding: 6rem 0;
+  background-color: var(--ifm-background-color);
+  position: relative;
+}
+
+.featuredBooks:not(.visible) {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.featuredBooks.visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.sectionTitle {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--ifm-color-primary-darker);
+}
+
+[data-theme='dark'] .sectionTitle {
+  color: var(--ifm-color-primary-lighter);
+}
+
+.sectionSubtitle {
+  font-size: 1.2rem;
+  color: var(--ifm-color-primary-light);
+  max-width: 600px;
+  margin: 0 auto 3rem auto;
+}
+
+[data-theme='dark'] .sectionSubtitle {
+  color: var(--ifm-color-primary-lighter);
+}
+
+.bookCard {
+  margin-bottom: 2rem;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+.bookCard:nth-child(1) {
+  animation-delay: 0.2s;
+}
+
+.bookCard:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.bookCard:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.bookCard:nth-child(4) {
+  animation-delay: 0.5s;
+}
+
+.bookCardInner {
+  height: 100%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid var(--ifm-color-primary-lightest);
+}
+
+.bookCardInner:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  border-color: var(--ifm-color-primary-light);
+}
+
+.bookTitle {
+  color: var(--ifm-color-primary-darker);
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+  transition: color 0.3s ease;
+}
+
+[data-theme='dark'] .bookTitle {
+  color: var(--ifm-color-primary-lighter);
+}
+
+.bookCardInner:hover .bookTitle {
+  color: var(--ifm-color-primary);
+}
+
+.moduleTag {
+  display: inline-block;
+  background: var(--ifm-color-primary-lightest);
+  color: var(--ifm-color-primary-darker);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+
+[data-theme='dark'] .moduleTag {
+  background: var(--ifm-color-primary-darker);
+  color: var(--ifm-color-primary-lightest);
+}
+
+.bookCardInner:hover .moduleTag {
+  background: var(--ifm-color-primary);
+  color: white;
+}
+
+.bookDescription {
+  color: var(--ifm-color-primary-light);
+  margin-bottom: 0;
+}
+
+[data-theme='dark'] .bookDescription {
+  color: var(--ifm-color-primary-lighter);
+}
+
+.cta {
+  padding: 6rem 0;
+  text-align: center;
+}
+
+.cta:not(.visible) {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.cta.visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.ctaTitle {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--ifm-color-primary-darker);
+}
+
+[data-theme='dark'] .ctaTitle {
+  color: var(--ifm-color-primary-lighter);
+}
+
+.ctaSubtitle {
+  font-size: 1.2rem;
+  color: var(--ifm-color-primary-light);
+  max-width: 600px;
+  margin: 0 auto 2rem auto;
+}
+
+[data-theme='dark'] .ctaSubtitle {
+  color: var(--ifm-color-primary-lighter);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 996px) {
+  .sectionTitle {
+    font-size: 2rem;
+  }
+
+  .sectionSubtitle,
+  .ctaSubtitle {
+    font-size: 1rem;
+  }
+
+  .ctaTitle {
+    font-size: 2rem;
+  }
+
+  .featureCardInner,
+  .bookCardInner {
+    padding: 1.5rem;
+  }
+}
