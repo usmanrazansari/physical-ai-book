@@ -1,0 +1,42 @@
+from setuptools import setup, find_packages
+
+setup(
+    name="physical-ai-book-backend",
+    version="1.0.0",
+    description="Backend for Physical AI Book Content Ingestion System",
+    packages=find_packages(),
+    install_requires=[
+        "fastapi>=0.104.1",
+        "uvicorn[standard]>=0.24.0",
+        "python-dotenv>=1.0.0",
+        "beautifulsoup4>=4.12.2",
+        "playwright>=1.40.0",
+        "cohere>=4.9.0",
+        "qdrant-client>=1.7.0",
+        "requests>=2.31.0",
+        "pydantic>=2.5.0",
+        "pydantic-core>=2.14.0",
+        "asyncio",
+        "python-multipart>=0.0.6",
+        "httpx>=0.25.0",
+        "numpy>=1.24.0",
+        "grpcio>=1.59.0",
+        "greenlet>=3.0.0",
+        "anyio>=3.7.0",
+        "certifi>=2023.07.22",
+        "click>=8.1.7",
+        "h11>=0.14.0",
+        "idna>=3.4",
+        "pydantic-extra-types>=2.1.0",
+        "pydantic-settings>=2.0.3",
+        "sniffio>=1.3.0",
+        "starlette>=0.27.0",
+        "typing-extensions>=4.8.0",
+    ],
+    python_requires=">=3.11",
+    entry_points={
+        "console_scripts": [
+            "physical-ai-backend=backend.main:main",
+        ],
+    },
+)

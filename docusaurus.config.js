@@ -14,15 +14,18 @@ const config = {
   staticDirectories: ['static', 'public'],
 
   // Set the production url of your site here
-  url: 'https://your-username.github.io',
+  url: 'https://usmanrazansari.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub Pages deployment, it is often '/<projectName>/'
-  baseUrl: '/physical-ai-book',
+  baseUrl: '/physical-ai-book/',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub Pages, you don't need these.
-  organizationName: 'your-organization', // Usually your GitHub org/user name.
+  organizationName: 'usmanrazansari', // Usually your GitHub org/user name.
   projectName: 'physical-ai-book', // Usually your repo name.
+  deploymentBranch: 'gh-pages',
+  trailingSlash: true,
+
 
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',

@@ -48,5 +48,31 @@ Thumbs.db
 .specify/
 history/
 
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv/
+env.bak/
+.ENV/
+.python-version
+*.egg-info/
+.eggs/
+.ipython/
+.coverage
+.coverage.*
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git/modules/
+
 # Windows reserved
 nul
