@@ -94,21 +94,18 @@ const config = {
         },
       ],
       copyright: `Copyright © ${new Date().getFullYear()} Physical AI & Humanoid Robotics Book. Built with Docusaurus.`,
-      // This is where we inject the chat widget
-      customHtml: `
-        <div id="chat-root"></div>
-      `,
     },
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
     },
-    // Load React, ReactDOM, and Babel from CDN
     scripts: [
       'https://unpkg.com/react@18/umd/react.production.min.js',
       'https://unpkg.com/react-dom@18/umd/react-dom.production.min.js',
       'https://unpkg.com/@babel/standalone/babel.min.js',
       {
+        type: 'text/babel',
+        'data-type': 'jsx',
         innerHTML: `
           const { useState } = React;
 
@@ -117,17 +114,16 @@ const config = {
             const [query, setQuery] = useState('');
             const [history, setHistory] = useState([]);
 
-            const BACKEND_URL = "https://usmanhello-physical-ai-book.hf.space";
-
             const sendQuery = async () => {
               if (!query.trim()) return;
               setHistory([...history, { sender: 'You', text: query }]);
               try {
-                const resp = await fetch(https://usmanhello-physical-ai-book.hf.space/chat`, {
+                const resp = await fetch('https://usmanhello-physical-ai-book.hf.space/chat', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ query })
                 });
+                if (!resp.ok) throw new Error('Network error');
                 const data = await resp.json();
                 setHistory(prev => [...prev, { sender: 'Bot', text: data.answer || 'No answer received' }]);
               } catch (e) {
@@ -205,8 +201,6 @@ const config = {
             root.render(<ChatWidget />);
           }
         `,
-        type: 'text/babel',
-        'data-type': 'jsx',
       },
     ],
   }),
