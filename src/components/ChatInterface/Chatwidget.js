@@ -11,7 +11,7 @@ const ChatWidget = () => {
     if (!query.trim()) return;
     setHistory([...history, { sender: 'You', text: query }]);
     try {
-      const resp = await fetch(`${BACKEND_URL}/chat`, {
+      const resp = await fetch(`https://usmanhello-physical-ai-book.hf.space/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query })
@@ -91,3 +91,4 @@ const ChatWidget = () => {
 
 
 export default ChatWidget;
+
