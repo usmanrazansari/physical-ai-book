@@ -36,13 +36,13 @@ class ApiService {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
+              'Accept': 'application/json',
             },
             body: JSON.stringify(payload),
             signal: controller.signal,
-            // Add mode: 'cors' to ensure proper CORS handling
             mode: 'cors',
-            // Add cache: 'no-store' to avoid cache-related issues on mobile
-            cache: 'no-store'
+            cache: 'no-store',
+            credentials: 'omit'
           });
 
           clearTimeout(timeoutId);
@@ -114,7 +114,8 @@ class ApiService {
         method: 'GET',
         signal: controller.signal,
         mode: 'cors',
-        cache: 'no-store'
+        cache: 'no-store',
+        credentials: 'omit'
       });
 
       clearTimeout(timeoutId);
@@ -154,11 +155,13 @@ class ApiService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
         body: JSON.stringify(payload),
         signal: controller.signal,
         mode: 'cors',
-        cache: 'no-store'
+        cache: 'no-store',
+        credentials: 'omit'
       });
 
       clearTimeout(timeoutId);
