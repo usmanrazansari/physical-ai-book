@@ -22,8 +22,8 @@ const getBackendUrl = () => {
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
       return 'http://localhost:8000';
     } else {
-      // Default to a production-ready URL (can be configured in docusaurus.config.js)
-      return 'https://physical-ai-book-backend.onrender.com'; // Example production backend
+      // Use the working Hugging Face Space backend for production
+      return 'https://usmanhello-physical-ai-book.hf.space';
     }
   }
 

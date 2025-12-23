@@ -5,19 +5,25 @@ const ChatWidget = () => {
   const [query, setQuery] = useState('');
   const [history, setHistory] = useState([]);
 
-  const BACKEND_URL = "https://usmanhello-physical-ai-book.hf.space";  // Your live HF URL
+  // Define the backend URL - using a default that can be overridden by environment
+  // In browser, process.env is not available, so we check window object and URL parameters
+  const BACKEND_URL = (typeof window !== 'undefined' && window.BACKEND_URL)
+    ? window.BACKEND_URL
+    : (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
+      ? 'http://localhost:8000'
+      : 'https://usmanhello-physical-ai-book.hf.space';  // Production backend
 
   const sendQuery = async () => {
     if (!query.trim()) return;
     setHistory([...history, { sender: 'You', text: query }]);
     try {
-      const resp = await fetch(`${BACKEND_URL}/ask`, {
+      const resp = await fetch(`${BACKEND_URL}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query })
       });
       const data = await resp.json();
-      setHistory(prev => [...prev, { sender: 'Bot', text: data.answer || 'No answer' }]);
+      setHistory(prev => [...prev, { sender: 'Bot', text: data.answer || data.response || 'No answer' }]);
     } catch (e) {
       setHistory(prev => [...prev, { sender: 'Bot', text: 'Error: Connection issue. Try again.' }]);
     }

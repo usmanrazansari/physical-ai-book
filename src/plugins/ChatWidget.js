@@ -3,7 +3,13 @@ import ErrorBoundary from '../components/ErrorBoundary';
 import ChatInterface from '../components/ChatInterface/ChatInterface';
 import './ChatWidget.css';
 
-const ChatWidget = ({ backendUrl = 'http://localhost:8000' }) => {
+const ChatWidget = ({ backendUrl }) => {
+  // If backendUrl is not provided via props, determine it based on environment
+  const resolvedBackendUrl = backendUrl || (
+    typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+      ? 'http://localhost:8000'
+      : 'https://usmanhello-physical-ai-book.hf.space'
+  );
   const [isOpen, setIsOpen] = useState(false);
   const [hasAnimated, setHasAnimated] = useState(false);
 
@@ -40,7 +46,7 @@ const ChatWidget = ({ backendUrl = 'http://localhost:8000' }) => {
           </div>
           <div className="chat-widget-content">
             <ErrorBoundary>
-              <ChatInterface backendUrl={backendUrl} />
+              <ChatInterface backendUrl={resolvedBackendUrl} />
             </ErrorBoundary>
           </div>
         </div>

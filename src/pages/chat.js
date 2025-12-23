@@ -3,10 +3,35 @@ import Layout from '@theme/Layout';
 import ChatInterface from '../components/ChatInterface/ChatInterface';
 
 // Define the backend URL - using a default that can be overridden by environment
-// In browser, process.env is not available, so we only check window object
-const BACKEND_URL = typeof window !== 'undefined' && window.BACKEND_URL
-  ? window.BACKEND_URL
-  : 'http://localhost:8000';
+// In browser, process.env is not available, so we check window object and URL parameters
+const getBackendUrl = () => {
+  // Check for URL parameter override first
+  if (typeof window !== 'undefined') {
+    const urlParams = new URLSearchParams(window.location.search);
+    const backendParam = urlParams.get('backend');
+    if (backendParam) {
+      return backendParam;
+    }
+
+    // Check for window variable
+    if (window.BACKEND_URL) {
+      return window.BACKEND_URL;
+    }
+
+    // Check for environment-specific configuration
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      return 'http://localhost:8000';
+    } else {
+      // Use the working Hugging Face Space backend for production
+      return 'https://usmanhello-physical-ai-book.hf.space';
+    }
+  }
+
+  // Fallback for SSR
+  return 'http://localhost:8000';
+};
+
+const BACKEND_URL = getBackendUrl();
 
 export default function ChatPage() {
   return (
