@@ -59,9 +59,15 @@ app.add_middleware(
         "https://usmanrazansari.github.io",
         "https://usmanrazansari.github.io/",
         "https://*.github.io",
+        "https://*.hf.space",  # Allow Hugging Face Spaces
+        "https://usmanhello-physical-ai-book.hf.space",  # Specific Hugging Face Space
+        "http://localhost:3000",  # Local development
+        "http://localhost:8000",  # Local backend
+        "http://127.0.0.1:8000",  # Local backend alternative
+        "*",
     ],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_methods=["GET", "POST", "OPTIONS", "PUT", "DELETE"],
     allow_headers=["*"],
     max_age=86400,  # Cache preflight requests for 24 hours
 )
@@ -110,14 +116,25 @@ async def chat(request: Request):
         # Get JSON data from request
         data = await request.json()
         query = data.get('query', '')
+        context = data.get('context', None)  # Additional context from selected text
 
         config = Config()
         chat_manager = ChatManager(config)
-        response = await chat_manager.get_answer(query)
-        return {"answer": response}
+
+        # Pass context to the chat manager if available
+        if context:
+            response = await chat_manager.get_answer_with_context(query, context)
+        else:
+            response = await chat_manager.get_answer(query)
+
+        return response
     except Exception as e:
         app_logger.error(f"Error in chat endpoint: {str(e)}")
-        return {"answer": "Sorry, I encountered an error while processing your query. Please try again."}
+        return {
+            "response": "Sorry, I encountered an error while processing your query. Please try again.",
+            "sources": [],
+            "metadata": {}
+        }
 
 
 def main():
