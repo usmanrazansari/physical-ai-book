@@ -32,17 +32,25 @@ class ApiService {
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout for mobile
 
+          // Mobile-optimized headers and request options
           const response = await fetch(`${this.baseURL}/chat`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
               'Accept': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest',
+              // Additional headers that help with mobile connectivity
+              'Cache-Control': 'no-cache',
+              'X-Client-Type': 'web-app',
+              'X-Device-Type': /mobile|android|iphone|ipad/i.test(navigator.userAgent) ? 'mobile' : 'desktop'
             },
             body: JSON.stringify(payload),
             signal: controller.signal,
             mode: 'cors',
             cache: 'no-store',
-            credentials: 'omit'
+            credentials: 'omit',
+            // Keep connection alive for mobile
+            keepalive: true
           });
 
           clearTimeout(timeoutId);
@@ -110,12 +118,20 @@ class ApiService {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 second timeout for mobile
 
+      // Mobile-optimized headers for health check
       const response = await fetch(`${this.baseURL}/health`, {
         method: 'GET',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Cache-Control': 'no-cache',
+          'X-Client-Type': 'web-app',
+          'X-Device-Type': /mobile|android|iphone|ipad/i.test(navigator.userAgent) ? 'mobile' : 'desktop'
+        },
         signal: controller.signal,
         mode: 'cors',
         cache: 'no-store',
-        credentials: 'omit'
+        credentials: 'omit',
+        keepalive: true
       });
 
       clearTimeout(timeoutId);
@@ -151,17 +167,25 @@ class ApiService {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout for mobile
 
+      // Mobile-optimized headers and request options
       const response = await fetch(`${this.baseURL}/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          // Additional headers that help with mobile connectivity
+          'Cache-Control': 'no-cache',
+          'X-Client-Type': 'web-app',
+          'X-Device-Type': /mobile|android|iphone|ipad/i.test(navigator.userAgent) ? 'mobile' : 'desktop'
         },
         body: JSON.stringify(payload),
         signal: controller.signal,
         mode: 'cors',
         cache: 'no-store',
-        credentials: 'omit'
+        credentials: 'omit',
+        // Keep connection alive for mobile
+        keepalive: true
       });
 
       clearTimeout(timeoutId);

@@ -36,10 +36,24 @@ const BACKEND_URL = getBackendUrl();
 export default function ChatPage() {
   return (
     <Layout title="Book Assistant" description="Physical AI Book Assistant">
-      <div style={{ padding: '20px', maxWidth: '900px', margin: '0 auto' }}>
-        <h1>Physical AI Book Assistant</h1>
-        <p>Ask me anything about the Physical AI Book! Select text on the page and ask a question about it, or type your question below.</p>
-        <div style={{ marginTop: '20px', border: '1px solid #ddd', borderRadius: '8px', height: '600px' }}>
+      <div style={{
+        padding: '20px',
+        maxWidth: '900px',
+        margin: '0 auto',
+        width: '100%',
+        boxSizing: 'border-box'
+      }}>
+        <h1 style={{ textAlign: 'center' }}>Physical AI Book Assistant</h1>
+        <p style={{ textAlign: 'center' }}>Ask me anything about the Physical AI Book! Select text on the page and ask a question about it, or type your question below.</p>
+        <div style={{
+          marginTop: '20px',
+          border: '1px solid #ddd',
+          borderRadius: '8px',
+          height: '600px',
+          width: '100%',
+          maxWidth: '100%',
+          overflow: 'hidden'
+        }}>
           <ChatInterface backendUrl={BACKEND_URL} />
         </div>
       </div>
