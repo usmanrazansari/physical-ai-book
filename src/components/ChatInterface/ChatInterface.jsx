@@ -30,6 +30,8 @@ const ChatInterface = ({ backendUrl = 'http://localhost:8000' }) => {
     // Check initial connection status
     const checkInitialConnection = async () => {
       try {
+        // Try the health check but don't fail if it doesn't exist or takes too long
+        // Some backends might not have a /health endpoint
         const isConnected = await apiService.checkHealth();
         // Don't immediately mark as disconnected on initial check failure
         // as mobile networks might be slower to respond
@@ -38,7 +40,9 @@ const ChatInterface = ({ backendUrl = 'http://localhost:8000' }) => {
           // Keep current status instead of changing to disconnected immediately
         }
       } catch (error) {
-        console.log('Initial connection check failed, but keeping status as connected for mobile tolerance');
+        // The health endpoint might not exist or be accessible
+        // This is OK - we'll proceed assuming the backend is available
+        console.log('Health check failed or not available, proceeding with connection');
         // Keep current status instead of changing to disconnected immediately
       }
     };
@@ -138,8 +142,21 @@ const ChatInterface = ({ backendUrl = 'http://localhost:8000' }) => {
       console.error('Error sending message:', error);
 
       // Update connection status based on error
+      // On mobile, be more tolerant of connection issues
       if (connectionManager.current) {
-        connectionManager.current.updateStatus(CONNECTION_STATUS.ERROR, error.message);
+        // Don't immediately mark as ERROR for network-related issues on mobile
+        if (error.message.includes('Failed to fetch') ||
+            error.message.includes('NetworkError') ||
+            error.message.includes('timeout') ||
+            error.message.includes('CORS') ||
+            error.message.includes('network') ||
+            error.name === 'TypeError' ||
+            error.name === 'AbortError') {
+          // Keep as CONNECTED but show error to user - mobile networks can be flaky
+          connectionManager.current.updateStatus(CONNECTION_STATUS.CONNECTED, 'Connection issue detected');
+        } else {
+          connectionManager.current.updateStatus(CONNECTION_STATUS.ERROR, error.message);
+        }
       }
 
       // Add error message to chat
@@ -147,7 +164,14 @@ const ChatInterface = ({ backendUrl = 'http://localhost:8000' }) => {
         id: Date.now() + 1,
         text: error.message.includes('timeout')
           ? ERROR_MESSAGES.REQUEST_TIMEOUT
-          : 'Sorry, I encountered an error. Please check your connection and try again.',
+          : error.message.includes('Failed to fetch') ||
+            error.message.includes('NetworkError') ||
+            error.message.includes('network') ||
+            error.name === 'TypeError'
+            ? 'Connection failed. Mobile networks can be slower. Please try again.'
+            : error.name === 'AbortError'
+              ? 'Request timed out. Mobile networks may be slow. Please try again.'
+              : 'Sorry, I encountered an error. Please check your connection and try again.',
         sender: 'bot',
         timestamp: new Date().toISOString(),
         isError: true,
