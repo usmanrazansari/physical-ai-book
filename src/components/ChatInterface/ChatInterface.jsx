@@ -31,11 +31,15 @@ const ChatInterface = ({ backendUrl = 'http://localhost:8000' }) => {
     const checkInitialConnection = async () => {
       try {
         const isConnected = await apiService.checkHealth();
+        // Don't immediately mark as disconnected on initial check failure
+        // as mobile networks might be slower to respond
         if (!isConnected) {
-          connectionManager.current.updateStatus(CONNECTION_STATUS.DISCONNECTED, 'Initial connection check failed');
+          console.log('Initial connection check failed, but keeping status as connected for mobile tolerance');
+          // Keep current status instead of changing to disconnected immediately
         }
       } catch (error) {
-        connectionManager.current.updateStatus(CONNECTION_STATUS.DISCONNECTED, 'Initial connection check failed');
+        console.log('Initial connection check failed, but keeping status as connected for mobile tolerance');
+        // Keep current status instead of changing to disconnected immediately
       }
     };
 

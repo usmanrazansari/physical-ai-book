@@ -30,7 +30,7 @@ class ApiService {
 
           // Call the backend API with timeout
           const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+          const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout for mobile
 
           const response = await fetch(`${this.baseURL}/chat`, {
             method: 'POST',
@@ -38,7 +38,11 @@ class ApiService {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify(payload),
-            signal: controller.signal
+            signal: controller.signal,
+            // Add mode: 'cors' to ensure proper CORS handling
+            mode: 'cors',
+            // Add cache: 'no-store' to avoid cache-related issues on mobile
+            cache: 'no-store'
           });
 
           clearTimeout(timeoutId);
@@ -104,11 +108,13 @@ class ApiService {
   async checkHealth() {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 second timeout for mobile
 
       const response = await fetch(`${this.baseURL}/health`, {
         method: 'GET',
-        signal: controller.signal
+        signal: controller.signal,
+        mode: 'cors',
+        cache: 'no-store'
       });
 
       clearTimeout(timeoutId);
@@ -142,7 +148,7 @@ class ApiService {
       }
 
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout for mobile
 
       const response = await fetch(`${this.baseURL}/chat`, {
         method: 'POST',
@@ -150,7 +156,9 @@ class ApiService {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),
-        signal: controller.signal
+        signal: controller.signal,
+        mode: 'cors',
+        cache: 'no-store'
       });
 
       clearTimeout(timeoutId);
