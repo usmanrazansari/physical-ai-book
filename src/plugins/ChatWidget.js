@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ErrorBoundary from '../components/ErrorBoundary';
 import ChatInterface from '../components/ChatInterface/ChatInterface';
 import './ChatWidget.css';
 
@@ -38,7 +39,9 @@ const ChatWidget = ({ backendUrl = 'http://localhost:8000' }) => {
             </button>
           </div>
           <div className="chat-widget-content">
-            <ChatInterface backendUrl={backendUrl} />
+            <ErrorBoundary>
+              <ChatInterface backendUrl={backendUrl} />
+            </ErrorBoundary>
           </div>
         </div>
       )}

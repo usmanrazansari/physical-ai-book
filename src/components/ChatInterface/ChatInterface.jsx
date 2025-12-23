@@ -1,18 +1,51 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './ChatInterface.css';
 import { getApiService } from './ApiService';
+import ConnectionStatusManager from './ConnectionStatusManager';
+import { CONNECTION_STATUS, ERROR_MESSAGES } from './constants';
 
 const ChatInterface = ({ backendUrl = 'http://localhost:8000' }) => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedText, setSelectedText] = useState('');
-  const [connectionError, setConnectionError] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState(CONNECTION_STATUS.CONNECTED);
+  const [retryCount, setRetryCount] = useState(0);
+  const [preservedInput, setPreservedInput] = useState(''); // To preserve user input during failures
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
 
-  // Initialize API service
+  // Initialize API service with retry configuration
   const apiService = getApiService(backendUrl);
+
+  // Initialize connection status manager
+  const connectionManager = useRef(null);
+
+  useEffect(() => {
+    // Initialize connection status manager
+    connectionManager.current = new ConnectionStatusManager((newStatus) => {
+      setConnectionStatus(newStatus);
+    });
+
+    // Check initial connection status
+    const checkInitialConnection = async () => {
+      try {
+        const isConnected = await apiService.checkHealth();
+        if (!isConnected) {
+          connectionManager.current.updateStatus(CONNECTION_STATUS.DISCONNECTED, 'Initial connection check failed');
+        }
+      } catch (error) {
+        connectionManager.current.updateStatus(CONNECTION_STATUS.DISCONNECTED, 'Initial connection check failed');
+      }
+    };
+
+    checkInitialConnection();
+
+    // Cleanup function
+    return () => {
+      apiService.cancelCurrentOperation();
+    };
+  }, [backendUrl]);
 
   // Function to scroll to bottom of chat
   const scrollToBottom = () => {
@@ -44,7 +77,11 @@ const ChatInterface = ({ backendUrl = 'http://localhost:8000' }) => {
     if (!query.trim() && !context) return;
 
     setIsLoading(true);
-    setConnectionError(false); // Reset connection error state
+
+    // Update connection status to show we're trying to connect
+    if (connectionManager.current) {
+      connectionManager.current.updateStatus(CONNECTION_STATUS.RECONNECTING, 'Sending message');
+    }
 
     // Add user message to chat
     const userMessage = {
@@ -62,6 +99,11 @@ const ChatInterface = ({ backendUrl = 'http://localhost:8000' }) => {
       const result = await apiService.askQuestion(query, context);
 
       if (result.success) {
+        // Update connection status to connected on success
+        if (connectionManager.current) {
+          connectionManager.current.updateStatus(CONNECTION_STATUS.CONNECTED, 'Message sent successfully');
+        }
+
         // Add bot response to chat
         const botMessage = {
           id: Date.now() + 1,
@@ -73,33 +115,62 @@ const ChatInterface = ({ backendUrl = 'http://localhost:8000' }) => {
         };
 
         setMessages(prev => [...prev, botMessage]);
+      } else if (result.operationInProgress) {
+        // Handle case where operation is already in progress
+        const warningMessage = {
+          id: Date.now() + 1,
+          text: result.error,
+          sender: 'bot',
+          timestamp: new Date().toISOString(),
+          isWarning: true
+        };
+
+        setMessages(prev => [...prev, warningMessage]);
       } else {
         // Handle API error
         throw new Error(result.error);
       }
     } catch (error) {
       console.error('Error sending message:', error);
-      setConnectionError(true);
+
+      // Update connection status based on error
+      if (connectionManager.current) {
+        connectionManager.current.updateStatus(CONNECTION_STATUS.ERROR, error.message);
+      }
 
       // Add error message to chat
       const errorMessage = {
         id: Date.now() + 1,
-        text: 'Sorry, I encountered an error. Please check your connection and try again.',
+        text: error.message.includes('timeout')
+          ? ERROR_MESSAGES.REQUEST_TIMEOUT
+          : 'Sorry, I encountered an error. Please check your connection and try again.',
         sender: 'bot',
         timestamp: new Date().toISOString(),
-        isError: true
+        isError: true,
+        canRetry: true // Flag to indicate if retry is possible
       };
 
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
-      setInputValue('');
+
+      // If there was preserved input, restore it after the attempt
+      if (preservedInput) {
+        setInputValue(preservedInput);
+        setPreservedInput('');
+      } else {
+        setInputValue('');
+      }
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (inputValue.trim() || selectedText) {
+      // Preserve the input value in case of connection failure
+      if (inputValue.trim()) {
+        setPreservedInput(inputValue);
+      }
       sendMessage(inputValue, selectedText);
     }
   };
@@ -113,6 +184,24 @@ const ChatInterface = ({ backendUrl = 'http://localhost:8000' }) => {
     }
   };
 
+  // Function to handle retrying a failed message
+  const handleRetryMessage = (error_message) => {
+    // Find the user message that corresponds to this error
+    const userMessageIndex = messages.findIndex((msg, index) => {
+      // The user message should be the one before the error message
+      return index < messages.length - 1 &&
+             messages[index + 1]?.id === error_message.id &&
+             messages[index].sender === 'user';
+    });
+
+    if (userMessageIndex !== -1) {
+      const userMessage = messages[userMessageIndex];
+      // Preserve the input and resend the query
+      setPreservedInput(userMessage.text);
+      sendMessage(userMessage.text, userMessage.context);
+    }
+  };
+
   // Function to clear chat
   const clearChat = () => {
     setMessages([]);
@@ -121,7 +210,18 @@ const ChatInterface = ({ backendUrl = 'http://localhost:8000' }) => {
   return (
     <div className="chat-interface">
       <div className="chat-header">
-        <h3>Physical AI Book Assistant</h3>
+        <div className="header-content">
+          <h3>Physical AI Book Assistant</h3>
+          <div className={`connection-status ${connectionStatus}`}>
+            <span className="status-indicator"></span>
+            <span className="status-text">
+              {connectionStatus === CONNECTION_STATUS.CONNECTED && 'Online'}
+              {connectionStatus === CONNECTION_STATUS.DISCONNECTED && 'Offline'}
+              {connectionStatus === CONNECTION_STATUS.RECONNECTING && 'Reconnecting...'}
+              {connectionStatus === CONNECTION_STATUS.ERROR && 'Error'}
+            </span>
+          </div>
+        </div>
         <button className="clear-chat-btn" onClick={clearChat} title="Clear chat">
           ×
         </button>
@@ -136,7 +236,7 @@ const ChatInterface = ({ backendUrl = 'http://localhost:8000' }) => {
           messages.map((message) => (
             <div
               key={message.id}
-              className={`message ${message.sender} ${message.isError ? 'error' : ''}`}
+              className={`message ${message.sender} ${message.isError ? 'error' : ''} ${message.isWarning ? 'warning' : ''}`}
             >
               <div className="message-content">
                 {message.context && (
@@ -145,6 +245,13 @@ const ChatInterface = ({ backendUrl = 'http://localhost:8000' }) => {
                   </div>
                 )}
                 <div className="message-text">{message.text}</div>
+                {message.isError && message.canRetry && !isLoading && (
+                  <div className="error-actions">
+                    <button className="retry-button" onClick={() => handleRetryMessage(message)}>
+                      Retry
+                    </button>
+                  </div>
+                )}
                 {message.sources && message.sources.length > 0 && (
                   <div className="message-sources">
                     <details>
