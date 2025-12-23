@@ -3,9 +3,13 @@
  * Handles all communication with the backend RAG agent
  */
 
+import RetryMechanism from './RetryMechanism';
+import { DEFAULT_RETRY_CONFIG, ERROR_MESSAGES } from './constants';
+
 class ApiService {
-  constructor(baseURL) {
+  constructor(baseURL, retryConfig = {}) {
     this.baseURL = baseURL;
+    this.retryMechanism = new RetryMechanism({ ...DEFAULT_RETRY_CONFIG, ...retryConfig });
   }
 
   /**
@@ -16,37 +20,81 @@ class ApiService {
    */
   async askQuestion(query, context = null) {
     try {
-      // Prepare the payload
-      const payload = {
-        query: query,
-        ...(context && { context: context })
-      };
+      return await this.retryMechanism.executeWithRetry(async (attempt) => {
+        try {
+          // Prepare the payload
+          const payload = {
+            query: query,
+            ...(context && { context: context })
+          };
 
-      // Call the backend API
-      const response = await fetch(`${this.baseURL}/chat`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
+          // Call the backend API with timeout
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
+          const response = await fetch(`${this.baseURL}/chat`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+            signal: controller.signal
+          });
+
+          clearTimeout(timeoutId);
+
+          if (!response.ok) {
+            throw new Error(`Backend error: ${response.status} - ${response.statusText}`);
+          }
+
+          const data = await response.json();
+          return {
+            success: true,
+            data: data
+          };
+        } catch (error) {
+          // Log the error for debugging
+          console.error(`Attempt ${attempt + 1} failed:`, error.message);
+
+          // If it's an abort error (timeout), throw a specific error
+          if (error.name === 'AbortError') {
+            throw new Error(ERROR_MESSAGES.REQUEST_TIMEOUT);
+          }
+
+          throw error;
+        }
+      }, (error) => {
+        // Determine if we should retry based on the error
+        return this.shouldRetry(error);
       });
-
-      if (!response.ok) {
-        throw new Error(`Backend error: ${response.status} - ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      return {
-        success: true,
-        data: data
-      };
     } catch (error) {
-      console.error('Error in askQuestion:', error);
-      return {
-        success: false,
-        error: error.message
-      };
+      // If it's the "operation in progress" error, return a special response
+      if (error.message.includes('already in progress')) {
+        return {
+          success: false,
+          error: 'Request already in progress. Please wait for the previous request to complete.',
+          operationInProgress: true
+        };
+      }
+      throw error;
     }
+  }
+
+  /**
+   * Determines if an operation should be retried based on the error
+   * @param {Error} error - The error that occurred
+   * @returns {boolean} Whether to retry
+   */
+  shouldRetry(error) {
+    // Retry on network errors, timeouts, and server errors (5xx)
+    const errorMessage = error.message.toLowerCase();
+    return (
+      errorMessage.includes('failed to fetch') ||
+      errorMessage.includes('networkerror') ||
+      errorMessage.includes('timeout') ||
+      errorMessage.includes('aborterror') ||
+      error.message.includes('5') // catches 5xx status errors
+    );
   }
 
   /**
@@ -55,10 +103,15 @@ class ApiService {
    */
   async checkHealth() {
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
       const response = await fetch(`${this.baseURL}/health`, {
         method: 'GET',
+        signal: controller.signal
       });
 
+      clearTimeout(timeoutId);
       return response.ok;
     } catch (error) {
       console.error('Health check failed:', error);
@@ -88,13 +141,19 @@ class ApiService {
         throw new Error('Streaming is not supported in this browser');
       }
 
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
       const response = await fetch(`${this.baseURL}/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),
+        signal: controller.signal
       });
+
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         throw new Error(`Backend error: ${response.status} - ${response.statusText}`);
@@ -121,14 +180,32 @@ class ApiService {
       onError(error.message);
     }
   }
+
+  /**
+   * Cancel the current operation if possible
+   */
+  cancelCurrentOperation() {
+    this.retryMechanism.cancelCurrentOperation();
+  }
+
+  /**
+   * Get retry mechanism status
+   */
+  getRetryStatus() {
+    return {
+      isRetrying: this.retryMechanism.isRetrying(),
+      currentAttempt: this.retryMechanism.getCurrentAttempt(),
+      maxRetries: this.retryMechanism.config.maxRetries
+    };
+  }
 }
 
 // Default instance - can be configured with environment variable or prop
 let apiServiceInstance = null;
 
-export const getApiService = (baseURL) => {
+export const getApiService = (baseURL, retryConfig = {}) => {
   if (!apiServiceInstance) {
-    apiServiceInstance = new ApiService(baseURL);
+    apiServiceInstance = new ApiService(baseURL, retryConfig);
   }
   return apiServiceInstance;
 };

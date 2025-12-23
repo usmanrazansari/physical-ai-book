@@ -27,6 +27,12 @@
   z-index: 2;
 }
 
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .chat-header h3 {
   margin: 0;
   font-size: 18px;
@@ -36,6 +42,85 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+.connection-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(4px);
+}
+
+.status-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #e5e7eb; /* Default color */
+}
+
+.connection-status.connected .status-indicator {
+  background-color: #10b981; /* Green for connected */
+  box-shadow: 0 0 6px #10b981;
+}
+
+.connection-status.disconnected .status-indicator {
+  background-color: #ef4444; /* Red for disconnected */
+}
+
+.connection-status.reconnecting .status-indicator {
+  background-color: #f59e0b; /* Yellow for reconnecting */
+  animation: pulse 1.5s infinite;
+}
+
+.connection-status.error .status-indicator {
+  background-color: #ef4444; /* Red for error */
+  animation: pulse 1s infinite;
+}
+
+.status-text {
+  color: white;
+  font-size: 12px;
+}
+
+.error-actions {
+  margin-top: 8px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.retry-button {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 6px 12px;
+  font-size: 0.85em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.retry-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+}
+
+.retry-button:active {
+  transform: translateY(0);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .clear-chat-btn {
@@ -98,6 +183,12 @@
 .message.error {
   background-color: #ffebee !important;
   border-color: #f44336 !important;
+}
+
+.message.warning {
+  background-color: #fff8e1 !important;
+  border-color: #ffc107 !important;
+  color: #ff8f00;
 }
 
 .message-content {
